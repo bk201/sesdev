@@ -32,6 +32,11 @@ zypper --non-interactive removerepo repo-source-non-oss || true
 zypper addrepo --refresh {{ os_repo_url }} {{ os_repo_name }}
 {% endfor %}
 
+# zypper rr repo-oss
+# zypper rr repo-update
+# zypper ar http://192.168.2.106:18080/repos/pacific/oss repo-oss
+# zypper ar http://192.168.2.106:18080/repos/pacific/oss-update repo-update
+
 {% set devel_repo_script = "/home/vagrant/add-devel-repo.sh" %}
 cat > {{ devel_repo_script }} << 'EOF'
 #!/bin/bash

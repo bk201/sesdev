@@ -1,4 +1,13 @@
 
+{% if stop_before_ceph_salt_apply or stop_before_ceph_orch_apply or stop_before_ceph_salt_config %}
+# too lazy, create a script for following works
+SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/$(basename ${BASH_SOURCE[0]})"
+MY_SCRIPT=/root/go.sh
+echo "#!/bin/bash -ex" > $MY_SCRIPT
+awk '/^exit\s0/{y=1;next}y' $SCRIPT_PATH >> $MY_SCRIPT
+chmod +x $MY_SCRIPT
+{% endif %}
+
 set -ex
 
 {% if ceph_salt_git_repo and ceph_salt_git_branch %}
@@ -73,6 +82,9 @@ ceph-salt config /cephadm_bootstrap/ceph_conf/global set "osd crush chooseleaf t
 ceph-salt config /cephadm_bootstrap/dashboard/username set admin
 ceph-salt config /cephadm_bootstrap/dashboard/password set admin
 ceph-salt config /cephadm_bootstrap/dashboard/force_password_update disable
+
+ceph-salt config /containers/registries_conf/registries add location=192.168.2.106:5000/registry.opensuse.org prefix=registry.opensuse.org insecure=true
+ceph-salt config /containers/registries_conf/registries add location=192.168.2.106:5000/quay.io prefix=quay.io insecure=true
 
 ceph-salt config ls
 ceph-salt export --pretty

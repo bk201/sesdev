@@ -1237,5 +1237,38 @@ def replace_mgr_modules(deployment_id, **kwargs):
     dep.replace_mgr_modules(**kwargs)
 
 
+@cli.command()
+@click.argument('create_cmd')
+@click.argument('repo_cache')
+@click.argument('namespace')
+def repo(create_cmd, repo_cache, namespace, **kwargs):
+    """sesdev repo ses6 http://192.168.2.106:18080"""
+    os = Constant.VERSION_PREFERRED_OS[create_cmd]
+    repos = Constant.OS_REPOS.get(os, {})
+
+    click.echo('repo-cache-cli namespace create {}'.format(namespace))
+    version_repos = {}
+    for idx, dev_repo in enumerate(Constant.VERSION_OS_REPO_MAPPING[create_cmd].get(os, [])):
+        version_repos['{}-devel-repo-{}'.format(create_cmd, idx)] = dev_repo
+    for name, url in repos.items():
+        click.echo('repo-cache-cli repo create {} {} {}'.format(namespace, name, url))
+    for name, url in version_repos.items():
+        click.echo('repo-cache-cli repo create {} {} {}'.format(namespace, name, url))
+
+    click.echo('os_repos:')
+    click.echo('  {}:'.format(os))
+    for name, url in repos.items():
+        local_url = '{}/repos/{}/{}'.format(repo_cache, namespace, name)
+        click.echo("    {}: {}".format(name, local_url))
+
+    click.echo('version_os_repo_mapping:')
+    click.echo('  {}:'.format(create_cmd))
+    click.echo('    {}:'.format(os))
+    for name, url in version_repos.items():
+        local_url = '{}/repos/{}/{}'.format(repo_cache, namespace, name)
+        click.echo("      - {}".format(local_url))
+    click.echo('Remember to update ~/.sesdev/config')
+
+
 if __name__ == '__main__':
     sys.exit(sesdev_main())
